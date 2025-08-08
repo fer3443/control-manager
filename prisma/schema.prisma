@@ -6,7 +6,6 @@
 
 generator client {
   provider = "prisma-client-js"
-  output   = "../generated/prisma"
 }
 
 datasource db {
@@ -54,11 +53,16 @@ model Brand {
 }
 
 model Category {
-  id        String    @id @default(uuid())
-  name      String    @unique
-  products  Product[]
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  id            String     @id @default(uuid())
+  name          String     @unique
+  parentId      String?
+  parent        Category?  @relation("CategoryHierarchy", fields: [parentId], references: [id])
+  subcategories Category[] @relation("CategoryHierarchy")
+  products      Product[]
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+
+  @@unique([name, parentId])
 }
 
 model StockMovement {
@@ -109,6 +113,7 @@ model UserConfig {
 model Supplier {
   id          String    @id @default(uuid())
   name        String
+  companyName String?
   contactInfo String?
   products    Product[]
   createdAt   DateTime  @default(now())
