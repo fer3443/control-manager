@@ -1,0 +1,140 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Product {
+  id             String          @id @default(uuid())
+  name           String
+  brandId        String
+  brand          Brand           @relation(fields: [brandId], references: [id])
+  description    String?
+  minStock       Int             @default(0) //para dar alertas
+  currentStock   Int
+  unitMeasure    UnitMeasure
+  costPrice      Float
+  salePrice      Float
+  profitMargin   Float? //Por si quiero definir porcentaje por categoria
+  expiresDate    DateTime?
+  barcode        String?         @unique
+  isActive       Boolean         @default(true)
+  categoryId     String?
+  category       Category?       @relation(fields: [categoryId], references: [id])
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  stockMovements StockMovement[]
+  supplier       Supplier?       @relation(fields: [supplierId], references: [id])
+  supplierId     String?
+  user           User?           @relation(fields: [userId], references: [id])
+  userId         String?
+
+  @@unique([barcode, userId])
+  @@index([name])
+  @@index([categoryId])
+  @@index([brandId])
+}
+
+model Brand {
+  id        String    @id @default(uuid())
+  name      String    @unique
+  products  Product[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model Category {
+  id        String    @id @default(uuid())
+  name      String    @unique
+  products  Product[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model StockMovement {
+  id            String            @id @default(uuid())
+  productId     String
+  product       Product           @relation(fields: [productId], references: [id])
+  type          StockMovementType
+  unitCost      Float? //precio de costo al momento de movimiento
+  unitSalePrice Float? //de venta al momento del movimiento
+  quantity      Int
+  reason        String? // Por qué se movio: compra, venta, ajuste, perdida
+  date          DateTime          @default(now())
+  createdAt     DateTime          @default(now())
+  performedById String? //usuario que hizo el mov
+  performedBy   User?             @relation(fields: [performedById], references: [id])
+}
+
+model User {
+  id                 String          @id @default(uuid())
+  name               String
+  email              String          @unique
+  password           String
+  businessName       String? //nombre del negocio
+  isVerified         Boolean         @default(false)
+  role               Role            @default(USER)
+  isActive           Boolean         @default(true)
+  verifiedAt         DateTime?
+  createdAt          DateTime        @default(now())
+  updatedAt          DateTime        @updatedAt
+  products           Product[]
+  userConfig         UserConfig?
+  performedMovements StockMovement[]
+}
+
+model UserConfig {
+  id                     String   @id @default(uuid())
+  alertsEnabled          Boolean  @default(true)
+  currency               String? //ISO 4217, ej: "USD", "ARS"
+  profitMarginPercentage Float    @default(0) //%de ganancias
+  daysBeforeExpiryAlert  Int      @default(7) //dias antes de vencimiento
+  stockAlertEnabled      Boolean  @default(true)
+  createdAt              DateTime @default(now())
+  userId                 String   @unique
+  user                   User     @relation(fields: [userId], references: [id])
+}
+
+//preventista o vendedor
+model Supplier {
+  id          String    @id @default(uuid())
+  name        String
+  contactInfo String?
+  products    Product[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+enum Role {
+  USER
+  SUPERUSER
+  ADMIN
+}
+
+enum UnitMeasure {
+  UNIT
+  GRAM
+  KILOGRAM
+  LITER
+  METER
+  BOX
+  PACKAGE
+  OTHER
+}
+
+//para entradas y salidas de  prod
+enum StockMovementType {
+  IN
+  OUT
+  ADJUSTMENT //ajuste de stock en caso de perdida o error
+}
