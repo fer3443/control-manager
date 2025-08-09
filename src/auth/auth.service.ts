@@ -42,23 +42,18 @@ export class AuthService {
       where: { email: cleanEmail },
       select: {
         id: true,
-        email: true,
         password: true,
         name: true,
-        role: true,
-        isActive: true
       }
     })
 
     if (!user) throw new UnauthorizedException('Credenciales incorrectas');
 
-    const { id, role, password, isActive, ...rest } = user;
-
-    if (!isActive) throw new UnauthorizedException('Usuario inactivo');
+    const { id, password, ...rest } = user;
 
     if (!bcrypt.compareSync(loginUserDto.password, password)) throw new UnauthorizedException('Credenciales incorrectas');
 
-    const payload: JwtPayload = { id, role };
+    const payload: JwtPayload = { id };
 
     return {
       ...rest,

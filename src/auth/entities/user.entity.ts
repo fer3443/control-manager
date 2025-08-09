@@ -4,7 +4,7 @@ export class UserEntity {
   email:string;
   businessName?:string;
   isVeriified:boolean;
-  role:string;
+  role:string[];
   isActive:boolean;
   createdAt:Date;
   updatedAt:Date;

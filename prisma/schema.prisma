@@ -24,7 +24,7 @@ model Product {
   unitMeasure    UnitMeasure
   costPrice      Float
   salePrice      Float
-  profitMargin   Float? //Por si quiero definir porcentaje por categoria
+  profitMargin   Int? //Por si quiero definir porcentaje por categoria
   expiresDate    DateTime?
   barcode        String?         @unique
   isActive       Boolean         @default(true)
@@ -35,8 +35,8 @@ model Product {
   stockMovements StockMovement[]
   supplier       Supplier?       @relation(fields: [supplierId], references: [id])
   supplierId     String?
-  user           User?           @relation(fields: [userId], references: [id])
-  userId         String?
+  user           User           @relation(fields: [userId], references: [id])
+  userId         String
 
   @@unique([barcode, userId])
   @@index([name])
@@ -87,7 +87,7 @@ model User {
   password           String
   businessName       String? //nombre del negocio
   isVerified         Boolean         @default(false)
-  role               Role            @default(USER)
+  role               String[]        @default(["USER"])
   isActive           Boolean         @default(true)
   verifiedAt         DateTime?
   createdAt          DateTime        @default(now())
@@ -101,7 +101,7 @@ model UserConfig {
   id                     String   @id @default(uuid())
   alertsEnabled          Boolean  @default(true)
   currency               String? //ISO 4217, ej: "USD", "ARS"
-  profitMarginPercentage Float    @default(0) //%de ganancias
+  profitMarginPercentage Int    @default(0) //%de ganancias
   daysBeforeExpiryAlert  Int      @default(7) //dias antes de vencimiento
   stockAlertEnabled      Boolean  @default(true)
   createdAt              DateTime @default(now())
@@ -118,12 +118,6 @@ model Supplier {
   products    Product[]
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
-}
-
-enum Role {
-  USER
-  SUPERUSER
-  ADMIN
 }
 
 enum UnitMeasure {
