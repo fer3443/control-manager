@@ -42,6 +42,7 @@ model Product {
   @@index([name])
   @@index([categoryId])
   @@index([brandId])
+  @@index([userId])
 }
 
 model Brand {

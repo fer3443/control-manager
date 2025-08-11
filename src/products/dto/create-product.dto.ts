@@ -1,4 +1,5 @@
 import { UnitMeasure } from "@prisma/client";
+import { Type } from "class-transformer";
 import { IsBoolean, IsDateString, IsEnum, IsInt, IsNumber, IsOptional, IsString, IsUUID, Max, Min } from "class-validator";
 
 export class CreateProductDto {
@@ -14,25 +15,30 @@ export class CreateProductDto {
   @IsString()
   description?:string;
 
+  @Type(() => Number)
   @IsInt()
   @Min(0)
   minStock:number;
 
+  @Type(() => Number)
   @IsInt()
   @Min(0)
   currentStock:number;
 
   @IsEnum(UnitMeasure)
-  unitMeasure:string;
+  unitMeasure: UnitMeasure;
 
+  @Type(() => Number)
   @IsNumber({maxDecimalPlaces:2})
   costPrice:number;
 
+  @Type(() => Number)
   @IsOptional()
   @IsNumber({maxDecimalPlaces: 2})
   salePrice:number;
 
   @IsOptional()
+  @Type(() => Number)
   @IsNumber({maxDecimalPlaces:2})
   @Min(0)
   @Max(100)
