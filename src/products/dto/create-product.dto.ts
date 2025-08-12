@@ -10,7 +10,7 @@ export class CreateProductDto {
   @IsUUID()
   @IsString()
   brandId:string;
-
+  
   @IsOptional()
   @IsString()
   description?:string;

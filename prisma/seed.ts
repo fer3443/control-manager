@@ -22,20 +22,20 @@ async function main() {
   // Crear algunas categorías base
   const categories = await prisma.category.createMany({
     data: [
-      { name: 'Bebidas' },
-      { name: 'Articulos de limpieza' },
-      { name: 'Fiambres' },
-      { name: 'Lacteos' },
+      { name: 'Bebidas',userId: admin.id },
+      { name: 'Articulos de limpieza', userId: admin.id },
+      { name: 'Fiambres', userId: admin.id },
+      { name: 'Lacteos', userId: admin.id },
     ],
   });
 
   // Crear algunas marcas
   const brands = await prisma.brand.createMany({
     data: [
-      { name: 'Coca-Cola' },
-      { name: 'Pepsi' },
-      { name: 'Nestlé' },
-      { name: 'P&G' },
+      { name: 'Coca-Cola', userId: admin.id },
+      { name: 'Pepsi', userId: admin.id },
+      { name: 'Nestlé',userId: admin.id },
+      { name: 'P&G', userId: admin.id },
     ],
   });
 
@@ -44,7 +44,7 @@ async function main() {
     data: [
       {
         name: 'Coca-Cola 2L',
-        brandId: (await prisma.brand.findUnique({ where: { name: 'Coca-Cola' } }))?.id!,
+        brandId: (await prisma.brand.findFirst({ where: { name: 'Coca-Cola', userId: admin.id } }))?.id!,
         description: 'Botella de Coca-Cola 2 litros',
         minStock: 10,
         currentStock: 50,
@@ -54,11 +54,11 @@ async function main() {
         profitMargin: 40,
         userId: admin.id,
         barcode: '7790895000996',
-        categoryId: (await prisma.category.findUnique({ where: { name: 'Bebidas' } }))?.id,
+        categoryId: (await prisma.category.findFirst({ where: { name: 'Bebidas', userId: admin.id } }))?.id,
       },
       {
         name: 'Pepsi 2L',
-        brandId: (await prisma.brand.findUnique({ where: { name: 'Pepsi' } }))?.id!,
+        brandId: (await prisma.brand.findFirst({ where: { name: 'Pepsi', userId: admin.id } }))?.id!,
         description: 'Botella de Pepsi 2 litros',
         minStock: 10,
         currentStock: 45,
@@ -68,7 +68,7 @@ async function main() {
         profitMargin: 39,
         userId: admin.id,
         barcode: '7790895000997',
-        categoryId: (await prisma.category.findUnique({ where: { name: 'Bebidas' } }))?.id,
+        categoryId: (await prisma.category.findFirst({ where: { name: 'Bebidas', userId: admin.id } }))?.id,
       },
     ],
   });
